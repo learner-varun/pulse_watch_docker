@@ -24,6 +24,7 @@ COPY scripts/package.json              ./scripts/
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source after deps are installed (better layer caching)
+COPY tsconfig.base.json tsconfig.json ./
 COPY lib/       ./lib/
 COPY artifacts/api-server/ ./artifacts/api-server/
 

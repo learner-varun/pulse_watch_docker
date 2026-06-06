@@ -21,6 +21,7 @@ COPY scripts/package.json              ./scripts/
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source
+COPY tsconfig.base.json tsconfig.json ./
 COPY lib/                   ./lib/
 COPY artifacts/pulse-watch/ ./artifacts/pulse-watch/
 
