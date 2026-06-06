@@ -1,0 +1,1 @@
+{"version":3,"file":"endpointInput.d.ts","sourceRoot":"","sources":["../../../src/generated/types/endpointInput.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAEH,MAAM,WAAW,aAAa;IAC5B,mBAAmB;IACnB,IAAI,EAAE,MAAM,CAAC;IACb,mBAAmB;IACnB,WAAW,EAAE,MAAM,CAAC;IACpB,kBAAkB,EAAE,MAAM,CAAC;IAC3B,oBAAoB,EAAE,MAAM,CAAC;CAC9B"}

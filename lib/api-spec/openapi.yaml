@@ -1,0 +1,387 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Pulse Watch API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: endpoints
+    description: Monitored API endpoint management
+  - name: executions
+    description: Health check execution history
+  - name: settings
+    description: Dashboard settings
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /endpoints:
+    get:
+      operationId: listEndpoints
+      tags: [endpoints]
+      summary: List all monitored endpoints
+      responses:
+        "200":
+          description: List of endpoints
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonitoredEndpoint"
+    post:
+      operationId: createEndpoint
+      tags: [endpoints]
+      summary: Add a new endpoint to monitor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EndpointInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonitoredEndpoint"
+        "400":
+          description: Invalid input
+
+  /endpoints/{id}:
+    delete:
+      operationId: deleteEndpoint
+      tags: [endpoints]
+      summary: Remove a monitored endpoint
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /endpoints/{id}/history:
+    get:
+      operationId: getEndpointHistory
+      tags: [endpoints]
+      summary: Get response time history for a single endpoint (last 100 data points)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: History data points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryPoint"
+        "404":
+          description: Not found
+
+  /overview:
+    get:
+      operationId: getOverview
+      tags: [endpoints]
+      summary: Get aggregate overview stats
+      responses:
+        "200":
+          description: Overview statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OverviewStats"
+
+  /executions:
+    get:
+      operationId: listExecutions
+      tags: [executions]
+      summary: List health check execution runs (last 200)
+      responses:
+        "200":
+          description: List of executions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Execution"
+
+  /executions/{id}:
+    get:
+      operationId: getExecution
+      tags: [executions]
+      summary: Get detailed results for a single execution run
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Execution detail with per-endpoint results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecutionDetail"
+        "404":
+          description: Not found
+
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get current dashboard settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    put:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update dashboard settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsInput"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+
+  /test-endpoint:
+    post:
+      operationId: testEndpoint
+      tags: [endpoints]
+      summary: Test a curl command without saving the endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EndpointInput"
+      responses:
+        "200":
+          description: Test result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestResult"
+
+  /check:
+    post:
+      operationId: triggerCheck
+      tags: [executions]
+      summary: Trigger an immediate health check of all endpoints
+      responses:
+        "200":
+          description: Execution results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecutionDetail"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    MonitoredEndpoint:
+      type: object
+      required: [id, name, curlCommand, expectedStatusCode, expectedResponseTime, status, lastResponseTime, lastCheckedAt, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        curlCommand:
+          type: string
+        expectedStatusCode:
+          type: integer
+        expectedResponseTime:
+          type: integer
+        status:
+          type: string
+          enum: [healthy, warning, failed, pending]
+        lastResponseTime:
+          type: ["integer", "null"]
+        lastCheckedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    EndpointInput:
+      type: object
+      required: [name, curlCommand, expectedStatusCode, expectedResponseTime]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        curlCommand:
+          type: string
+          minLength: 1
+        expectedStatusCode:
+          type: integer
+          default: 200
+        expectedResponseTime:
+          type: integer
+          default: 300
+
+    HistoryPoint:
+      type: object
+      required: [timestamp, responseTime, status]
+      properties:
+        timestamp:
+          type: string
+        responseTime:
+          type: integer
+        status:
+          type: string
+          enum: [success, error]
+
+    OverviewStats:
+      type: object
+      required: [totalApis, healthyApis, failedApis, warningApis, avgResponseTime]
+      properties:
+        totalApis:
+          type: integer
+        healthyApis:
+          type: integer
+        failedApis:
+          type: integer
+        warningApis:
+          type: integer
+        avgResponseTime:
+          type: integer
+
+    Execution:
+      type: object
+      required: [id, startedAt, totalApis, passed, failed, avgResponseTime]
+      properties:
+        id:
+          type: integer
+        startedAt:
+          type: string
+        totalApis:
+          type: integer
+        passed:
+          type: integer
+        failed:
+          type: integer
+        avgResponseTime:
+          type: integer
+
+    ExecutionResult:
+      type: object
+      required: [id, executionId, endpointId, endpointName, endpointUrl, status, responseTime]
+      properties:
+        id:
+          type: integer
+        executionId:
+          type: integer
+        endpointId:
+          type: integer
+        endpointName:
+          type: string
+        endpointUrl:
+          type: string
+        status:
+          type: string
+          enum: [passed, failed]
+        responseTime:
+          type: integer
+        errorMessage:
+          type: ["string", "null"]
+
+    ExecutionDetail:
+      type: object
+      required: [id, startedAt, totalApis, passed, failed, avgResponseTime, results]
+      properties:
+        id:
+          type: integer
+        startedAt:
+          type: string
+        totalApis:
+          type: integer
+        passed:
+          type: integer
+        failed:
+          type: integer
+        avgResponseTime:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExecutionResult"
+
+    Settings:
+      type: object
+      required: [id, checkIntervalMinutes]
+      properties:
+        id:
+          type: integer
+        checkIntervalMinutes:
+          type: integer
+
+    SettingsInput:
+      type: object
+      required: [checkIntervalMinutes]
+      properties:
+        checkIntervalMinutes:
+          type: integer
+          minimum: 1
+          maximum: 60
+
+    TestResult:
+      type: object
+      required: [status, responseTime]
+      properties:
+        status:
+          type: string
+          enum: [passed, failed]
+        responseTime:
+          type: integer
+        statusCode:
+          type: ["integer", "null"]
+        errorMessage:
+          type: ["string", "null"]
