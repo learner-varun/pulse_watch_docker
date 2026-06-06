@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # ─── Stage 1: builder ────────────────────────────────────────────────────────
-FROM node:24-alpine AS builder
+FROM node:24-bookworm-slim AS builder
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -18,7 +18,7 @@ COPY artifacts/pulse-watch/package.json ./artifacts/pulse-watch/
 COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
 COPY scripts/package.json              ./scripts/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source
 COPY lib/                   ./lib/

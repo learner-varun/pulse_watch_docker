@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # ─── Stage 1: builder ────────────────────────────────────────────────────────
 # Install the full monorepo and compile the esbuild bundle.
-FROM node:24-alpine AS builder
+FROM node:24-bookworm-slim AS builder
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -21,7 +21,7 @@ COPY artifacts/pulse-watch/package.json ./artifacts/pulse-watch/
 COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
 COPY scripts/package.json              ./scripts/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source after deps are installed (better layer caching)
 COPY lib/       ./lib/
@@ -33,7 +33,7 @@ RUN pnpm --filter @workspace/api-server run build
 # ─── Stage 2: runtime ────────────────────────────────────────────────────────
 # Lean image — esbuild bundles all JS dependencies, so node_modules are not
 # needed at runtime (only the dist/ folder).
-FROM node:24-alpine AS runtime
+FROM node:24-bookworm-slim AS runtime
 
 WORKDIR /app
 
