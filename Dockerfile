@@ -30,7 +30,7 @@ COPY artifacts/api-server/ ./artifacts/api-server/
 COPY artifacts/pulse-watch/ ./artifacts/pulse-watch/
 
 # Environment variables needed for frontend build
-ARG PORT=8080
+ARG PORT=7007
 ARG BASE_PATH=/
 ENV PORT=$PORT
 ENV BASE_PATH=$BASE_PATH
@@ -54,9 +54,9 @@ COPY --from=builder /app/artifacts/api-server/dist ./dist
 COPY --from=builder /app/artifacts/pulse-watch/dist/public ./public
 
 ENV NODE_ENV=production
-ENV PORT=8080
+ENV PORT=7007
 
-EXPOSE 8080
+EXPOSE 7007
 
 # Start the Express server
 CMD ["node", "--enable-source-maps", "./dist/index.mjs"]

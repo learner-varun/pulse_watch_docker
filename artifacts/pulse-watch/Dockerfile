@@ -47,6 +47,6 @@ COPY artifacts/pulse-watch/nginx.conf /etc/nginx/conf.d/pulse-watch.conf
 # Copy built static assets
 COPY --from=builder /app/artifacts/pulse-watch/dist/public /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 7007
 
 CMD ["nginx", "-g", "daemon off;"]

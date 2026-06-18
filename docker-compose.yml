@@ -52,7 +52,7 @@ services:
       dockerfile: artifacts/pulse-watch/Dockerfile
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "7007:7007"
     depends_on:
       - api
 
