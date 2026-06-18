@@ -18,7 +18,7 @@ COPY artifacts/pulse-watch/package.json ./artifacts/pulse-watch/
 COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
 COPY scripts/package.json              ./scripts/
 
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Copy source
 COPY tsconfig.base.json tsconfig.json ./
