@@ -74,7 +74,7 @@ export function APIList({ selectedEndpointId, onSelectEndpoint }: { selectedEndp
                   {ep.lastCheckedAt && ` • ${new Date(ep.lastCheckedAt).toLocaleTimeString()}`}
                 </span>
               </div>
-              <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-1 shrink-0 lg:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <Button 
                   variant="ghost" 
                   size="icon" 
