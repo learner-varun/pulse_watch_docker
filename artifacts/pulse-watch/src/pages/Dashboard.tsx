@@ -73,7 +73,7 @@ export default function Dashboard() {
             <APIList selectedEndpointId={selectedEndpointId} onSelectEndpoint={setSelectedEndpointId} />
           </div>
           <div className="lg:col-span-2 border rounded-lg bg-card overflow-hidden flex flex-col h-[500px] p-6">
-            <APIResponseGraph selectedEndpointId={selectedEndpointId} />
+            <APIResponseGraph selectedEndpointId={selectedEndpointId} onSelectEndpoint={setSelectedEndpointId} />
           </div>
         </div>
 
