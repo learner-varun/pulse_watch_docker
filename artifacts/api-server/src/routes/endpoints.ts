@@ -63,6 +63,43 @@ router.delete("/endpoints/:id", async (req, res): Promise<void> => {
   res.sendStatus(204);
 });
 
+router.put("/endpoints/:id", async (req, res): Promise<void> => {
+  const params = DeleteEndpointParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const parsed = CreateEndpointBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const [updated] = await db
+    .update(endpointsTable)
+    .set({
+      name: parsed.data.name,
+      curlCommand: parsed.data.curlCommand,
+      expectedStatusCode: parsed.data.expectedStatusCode ?? 200,
+      expectedResponseTime: parsed.data.expectedResponseTime ?? 300,
+      status: "pending",
+    })
+    .where(eq(endpointsTable.id, params.data.id))
+    .returning();
+
+  if (!updated) {
+    res.status(404).json({ error: "Endpoint not found" });
+    return;
+  }
+
+  res.json({
+    ...updated,
+    lastCheckedAt: updated.lastCheckedAt ? updated.lastCheckedAt.toISOString() : null,
+    createdAt: updated.createdAt.toISOString(),
+  });
+});
+
 router.get("/endpoints/:id/history", async (req, res): Promise<void> => {
   const params = GetEndpointHistoryParams.safeParse(req.params);
   if (!params.success) {

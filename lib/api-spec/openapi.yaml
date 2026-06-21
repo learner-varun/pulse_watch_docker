@@ -81,6 +81,33 @@ paths:
           description: Deleted
         "404":
           description: Not found
+    put:
+      operationId: updateEndpoint
+      tags: [endpoints]
+      summary: Update a monitored endpoint
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EndpointInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonitoredEndpoint"
+        "400":
+          description: Invalid input
+        "404":
+          description: Not found
 
   /endpoints/{id}/history:
     get:

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useCreateEndpoint, useTestEndpoint, getListEndpointsQueryKey } from "@workspace/api-client-react";
+import { useCreateEndpoint, useUpdateEndpoint, useTestEndpoint, getListEndpointsQueryKey, type MonitoredEndpoint } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -26,20 +26,29 @@ type TestState =
   | { phase: "testing" }
   | { phase: "done"; status: "passed" | "failed"; responseTime: number; statusCode: number | null; errorMessage: string | null };
 
-export function AddAPIModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+export function AddAPIModal({ 
+  open, 
+  onOpenChange, 
+  endpoint 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void; 
+  endpoint?: MonitoredEndpoint;
+}) {
   const [testState, setTestState] = useState<TestState>({ phase: "idle" });
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
-      curlCommand: "",
-      expectedStatusCode: 200,
-      expectedResponseTime: 300,
+      name: endpoint?.name || "",
+      curlCommand: endpoint?.curlCommand || "",
+      expectedStatusCode: endpoint?.expectedStatusCode ?? 200,
+      expectedResponseTime: endpoint?.expectedResponseTime ?? 300,
     },
   });
 
   const createEndpoint = useCreateEndpoint();
+  const updateEndpoint = useUpdateEndpoint();
   const testEndpoint = useTestEndpoint();
   const queryClient = useQueryClient();
 
@@ -48,6 +57,19 @@ export function AddAPIModal({ open, onOpenChange }: { open: boolean; onOpenChang
   React.useEffect(() => {
     setTestState({ phase: "idle" });
   }, [curlCommand]);
+
+  // Pre-populate form values when endpoint changes or modal opens
+  React.useEffect(() => {
+    if (open) {
+      form.reset({
+        name: endpoint?.name || "",
+        curlCommand: endpoint?.curlCommand || "",
+        expectedStatusCode: endpoint?.expectedStatusCode ?? 200,
+        expectedResponseTime: endpoint?.expectedResponseTime ?? 300,
+      });
+      setTestState({ phase: "idle" });
+    }
+  }, [open, endpoint, form]);
 
   const handleTest = async () => {
     const values = form.getValues();
@@ -83,17 +105,31 @@ export function AddAPIModal({ open, onOpenChange }: { open: boolean; onOpenChang
   };
 
   const onSubmit = (data: FormData) => {
-    toast.promise(createEndpoint.mutateAsync({ data }), {
-      loading: "Adding endpoint...",
-      success: () => {
-        queryClient.invalidateQueries({ queryKey: getListEndpointsQueryKey() });
-        onOpenChange(false);
-        form.reset();
-        setTestState({ phase: "idle" });
-        return "Endpoint added successfully";
-      },
-      error: "Failed to add endpoint",
-    });
+    if (endpoint) {
+      toast.promise(updateEndpoint.mutateAsync({ id: endpoint.id, data }), {
+        loading: "Updating endpoint...",
+        success: () => {
+          queryClient.invalidateQueries({ queryKey: getListEndpointsQueryKey() });
+          onOpenChange(false);
+          form.reset();
+          setTestState({ phase: "idle" });
+          return "Endpoint updated successfully";
+        },
+        error: "Failed to update endpoint",
+      });
+    } else {
+      toast.promise(createEndpoint.mutateAsync({ data }), {
+        loading: "Adding endpoint...",
+        success: () => {
+          queryClient.invalidateQueries({ queryKey: getListEndpointsQueryKey() });
+          onOpenChange(false);
+          form.reset();
+          setTestState({ phase: "idle" });
+          return "Endpoint added successfully";
+        },
+        error: "Failed to add endpoint",
+      });
+    }
   };
 
   const handleClose = (val: boolean) => {
@@ -108,7 +144,7 @@ export function AddAPIModal({ open, onOpenChange }: { open: boolean; onOpenChang
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Monitored API</DialogTitle>
+          <DialogTitle>{endpoint ? "Edit Monitored API" : "Add Monitored API"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -233,8 +269,8 @@ export function AddAPIModal({ open, onOpenChange }: { open: boolean; onOpenChang
               <Button type="button" variant="outline" onClick={() => handleClose(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={createEndpoint.isPending}>
-                Add API
+              <Button type="submit" disabled={createEndpoint.isPending || updateEndpoint.isPending}>
+                {endpoint ? "Save Changes" : "Add API"}
               </Button>
             </DialogFooter>
           </form>

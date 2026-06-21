@@ -105,6 +105,37 @@ export declare const useDeleteEndpoint: <TError = ErrorType<void>, TContext = un
 }) => UseMutationResult<Awaited<ReturnType<typeof deleteEndpoint>>, TError, {
     id: number;
 }, TContext>;
+export declare const getUpdateEndpointUrl: (id: number) => string;
+/**
+ * @summary Update a monitored endpoint
+ */
+export declare const updateEndpoint: (id: number, endpointInput: EndpointInput, options?: RequestInit) => Promise<MonitoredEndpoint>;
+export declare const getUpdateEndpointMutationOptions: <TError = ErrorType<void>, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof updateEndpoint>>, TError, {
+        id: number;
+        data: BodyType<EndpointInput>;
+    }, TContext>;
+    request?: SecondParameter<typeof customFetch>;
+}) => UseMutationOptions<Awaited<ReturnType<typeof updateEndpoint>>, TError, {
+    id: number;
+    data: BodyType<EndpointInput>;
+}, TContext>;
+export type UpdateEndpointMutationResult = NonNullable<Awaited<ReturnType<typeof updateEndpoint>>>;
+export type UpdateEndpointMutationBody = BodyType<EndpointInput>;
+export type UpdateEndpointMutationError = ErrorType<void>;
+/**
+* @summary Update a monitored endpoint
+*/
+export declare const useUpdateEndpoint: <TError = ErrorType<void>, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof updateEndpoint>>, TError, {
+        id: number;
+        data: BodyType<EndpointInput>;
+    }, TContext>;
+    request?: SecondParameter<typeof customFetch>;
+}) => UseMutationResult<Awaited<ReturnType<typeof updateEndpoint>>, TError, {
+    id: number;
+    data: BodyType<EndpointInput>;
+}, TContext>;
 export declare const getGetEndpointHistoryUrl: (id: number) => string;
 /**
  * @summary Get response time history for a single endpoint (last 100 data points)

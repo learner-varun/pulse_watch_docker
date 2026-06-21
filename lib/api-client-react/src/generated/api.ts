@@ -340,6 +340,59 @@ export const useDeleteEndpoint = <TError = ErrorType<void>,
       return useMutation(getDeleteEndpointMutationOptions(options));
     }
 
+export const getUpdateEndpointUrl = (id: number) => {
+  return `/api/endpoints/${id}`
+}
+
+/**
+ * @summary Update a monitored endpoint
+ */
+export const updateEndpoint = async (id: number, endpointInput: EndpointInput, options?: RequestInit): Promise<MonitoredEndpoint> => {
+  return customFetch<MonitoredEndpoint>(getUpdateEndpointUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(endpointInput)
+  }
+);}
+
+export const getUpdateEndpointMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateEndpoint>>, TError,{id: number, data: BodyType<EndpointInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateEndpoint>>, TError,{id: number, data: BodyType<EndpointInput>}, TContext> => {
+
+const mutationKey = ['updateEndpoint'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateEndpoint>>, {id: number, data: BodyType<EndpointInput>}> = (props) => {
+          const {id, data} = props ?? {};
+          return updateEndpoint(id, data, requestOptions)
+        }
+
+  return { mutationFn, ...mutationOptions }}
+
+export type UpdateEndpointMutationResult = NonNullable<Awaited<ReturnType<typeof updateEndpoint>>>
+export type UpdateEndpointMutationBody = BodyType<EndpointInput>
+export type UpdateEndpointMutationError = ErrorType<void>
+
+/**
+ * @summary Update a monitored endpoint
+ */
+export const useUpdateEndpoint = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateEndpoint>>, TError,{id: number, data: BodyType<EndpointInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateEndpoint>>,
+        TError,
+        {id: number, data: BodyType<EndpointInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateEndpointMutationOptions(options));
+    }
+
 export const getGetEndpointHistoryUrl = (id: number,) => {
 
 
