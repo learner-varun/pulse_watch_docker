@@ -503,7 +503,7 @@ export const getListExecutionsUrl = () => {
 }
 
 /**
- * @summary List health check execution runs (last 200)
+ * @summary List health check execution runs
  */
 export const listExecutions = async ( options?: RequestInit): Promise<Execution[]> => {
 
@@ -550,7 +550,7 @@ export type ListExecutionsQueryError = ErrorType<unknown>
 
 
 /**
- * @summary List health check execution runs (last 200)
+ * @summary List health check execution runs
  */
 
 export function useListExecutions<TData = Awaited<ReturnType<typeof listExecutions>>, TError = ErrorType<unknown>>(

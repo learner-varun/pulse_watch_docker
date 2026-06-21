@@ -15,8 +15,7 @@ router.get("/executions", async (_req, res): Promise<void> => {
   const rows = await db
     .select()
     .from(executionsTable)
-    .orderBy(desc(executionsTable.startedAt))
-    .limit(200);
+    .orderBy(desc(executionsTable.startedAt));
 
   const mapped = rows.map((r) => ({
     ...r,

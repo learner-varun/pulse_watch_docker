@@ -172,7 +172,7 @@ export declare const GetOverviewResponse: zod.ZodObject<{
     avgResponseTime: number;
 }>;
 /**
- * @summary List health check execution runs (last 200)
+ * @summary List health check execution runs
  */
 export declare const ListExecutionsResponseItem: zod.ZodObject<{
     id: zod.ZodNumber;

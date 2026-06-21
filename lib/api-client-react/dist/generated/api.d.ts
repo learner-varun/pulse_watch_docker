@@ -153,7 +153,7 @@ export declare function useGetOverview<TData = Awaited<ReturnType<typeof getOver
 };
 export declare const getListExecutionsUrl: () => string;
 /**
- * @summary List health check execution runs (last 200)
+ * @summary List health check execution runs
  */
 export declare const listExecutions: (options?: RequestInit) => Promise<Execution[]>;
 export declare const getListExecutionsQueryKey: () => readonly ["/api/executions"];
@@ -166,7 +166,7 @@ export declare const getListExecutionsQueryOptions: <TData = Awaited<ReturnType<
 export type ListExecutionsQueryResult = NonNullable<Awaited<ReturnType<typeof listExecutions>>>;
 export type ListExecutionsQueryError = ErrorType<unknown>;
 /**
- * @summary List health check execution runs (last 200)
+ * @summary List health check execution runs
  */
 export declare function useListExecutions<TData = Awaited<ReturnType<typeof listExecutions>>, TError = ErrorType<unknown>>(options?: {
     query?: UseQueryOptions<Awaited<ReturnType<typeof listExecutions>>, TError, TData>;

@@ -86,7 +86,7 @@ export const GetOverviewResponse = zod.object({
 
 
 /**
- * @summary List health check execution runs (last 200)
+ * @summary List health check execution runs
  */
 export const ListExecutionsResponseItem = zod.object({
   "id": zod.number(),

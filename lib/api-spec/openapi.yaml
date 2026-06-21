@@ -122,7 +122,7 @@ paths:
     get:
       operationId: listExecutions
       tags: [executions]
-      summary: List health check execution runs (last 200)
+      summary: List health check execution runs
       responses:
         "200":
           description: List of executions
